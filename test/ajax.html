@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<body>
+		<div id="load">
+		</div>
+		<a id="load-data" href="data.json">load data.json</a>
+		<script type="text/javascript" src="../src/ejs.js"></script>
+		<script type="text/javascript">
+			document.getElementById('load-data').addEventListener('click', function(evt)
+				{
+					evt.preventDefault();
+					ejs.xhr('GET').load('load').send();
+				}, true);
+		</script>
+	</body>
+</html>
