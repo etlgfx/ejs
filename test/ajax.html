@@ -9,8 +9,10 @@
 			document.getElementById('load-data').addEventListener('click', function(evt)
 				{
 					evt.preventDefault();
-					ejs.xhr('GET').load('load').send();
+					ejs.xhr('GET').callback(function (xhr, json) { document.getElementById('load').innerHTML = json; }).send('data.json');
 				}, true);
+
+			//ejs.xhr(document.getElementById('load-data'));
 		</script>
 	</body>
 </html>

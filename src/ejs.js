@@ -45,7 +45,27 @@ var ejs = (function() {
 		return str;
 	}
 
-	function xhr(method, params) {
+	function xhr() {
+		var args = Array.prototype.slice.call(arguments);
+
+		if (!args.length)
+			throw "Invalid Request";
+
+		/*
+		if (args[0] instanceof Element) {
+			var node = args.shift();
+
+			node.addEventListener('click', function
+		}
+		*/
+
+		var method = args.shift();
+
+		if (method.toUpperCase)
+			method = method.toUpperCase();
+		else
+			throw "method must be a string";
+
 		switch (method) {
 			case 'GET': case 'PUT': case 'POST': case 'DELETE': case 'PATCH': case 'TRACE': case 'HEAD':
 				this.method = method;
@@ -56,20 +76,13 @@ var ejs = (function() {
 		}
 
 		this.xhr = new XMLHttpRequest();
-		/*
-		   this.xhr.open(method, uri);
-
-		   this.xhr.setRequestHeader('Content-type', 'application/json');
-		   this.xhr.setRequestHeader('Content-length', data.length);
-		   this.xhr.setRequestHeader('Connection', 'close');
-		   */
-	}
+	};
 
 	xhr.prototype.load = function(id) {
 		this.id = id;
 
 		return this;
-	}
+	};
 
 	xhr.prototype.callback = function(cb) {
 		if (!cb instanceof Function) {
@@ -79,7 +92,7 @@ var ejs = (function() {
 		this.cb = cb;
 
 		return this;
-	}
+	};
 
 	xhr.prototype.send = function(uri, data) {
 		var xhr = this.xhr;
@@ -111,15 +124,22 @@ var ejs = (function() {
 			if (xhr.readyState == 4) {
 				switch (xhr.status) {
 					case 200:
-						if (self.cb) {
-							self.cb(xhr);
+						if (xhr.getResponseHeader('content-type') == 'application/json' && self.cb) {
+							self.cb(xhr, JSON.parse(xhr.responseText));
 						}
-						else if (self.id) {
-							document.getElementById(self.id).innerHTML = xhr.responseText;
+						else {
+							if (self.cb) {
+								self.cb(xhr);
+							}
+							else if (self.id) {
+								document.getElementById(self.id).innerHTML = xhr.responseText;
+							}
 						}
 						break;
 
 					default:
+						if (self.error_cb)
+							this.error_cb(xhr);
 						break;
 				}
 			}
@@ -128,7 +148,12 @@ var ejs = (function() {
 		xhr.send(this.data);
 
 		return this;
-	}
+	};
+
+	xhr.prototype.error = function(cb) {
+		if (cb instanceof Function)
+			this.error_cb = cb;
+	};
 
 	var form = {
 		serialize:
