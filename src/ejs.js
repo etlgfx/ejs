@@ -2,6 +2,15 @@ var ejs = (function() {
 
 	"use strict";
 
+	function debugAll() {
+		var ret = [];
+
+		for (var i = 0; i < arguments.length; i++)
+			ret[i] = debug(arguments[i]);
+
+		return ret.join(', ');
+	}
+
 	function debug(obj) {
 		var str = '';
 
@@ -200,7 +209,7 @@ var ejs = (function() {
 
 	return {
 		'form': { serialize: form.serialize },
-		'debug': debug,
+		'debug': debugAll,
 		'xhr': function (method, params) { return new xhr(method, params); }
 	};
 })();
